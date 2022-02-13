@@ -1,12 +1,22 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using Serilog;
+using System;
+using System.Threading.Tasks;
+using Uoiea.Models;
 
 namespace Uoiea
 {
     static class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            ILoggerFactory factory = new LoggerFactory().AddSerilog();
+
+            DiscordBot bot = new(new(factory));
+
+            await bot.StartAsync();
+
+            await Task.Delay(-1);
         }
     }
 }
