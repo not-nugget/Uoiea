@@ -19,13 +19,4 @@
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Content Include="FonixTalk.dll" />
-    <Content Include="ftalk_us.dll" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\SharpTalk\SharpTalk\SharpTalk.csproj" />
-  </ItemGroup>
-
 </Project>
