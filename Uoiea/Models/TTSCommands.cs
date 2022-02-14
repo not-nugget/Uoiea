@@ -2,21 +2,20 @@
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using DSharpPlus.VoiceNext;
-using System.IO;
 using System.IO.Pipes;
-using System.Threading.Tasks;
-using System;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
-using static Uoiea.Models.DiscordBot;
+using System.Threading.Tasks;
+using OpusDotNet;
+using System.IO;
+using System;
 
 namespace Uoiea.Models
 {
     public class TTSCommands : BaseCommandModule
     {
-        private StreamHandle TTSPipe { get; init; }
+        private NamedPipeServerStream TTSPipe { get; init; }
 
-        public TTSCommands(StreamHandle ttsPipe) => TTSPipe = ttsPipe;
+        public TTSCommands(NamedPipeServerStream ttsPipe) => TTSPipe = ttsPipe;
 
         [Command("join")]
         public async Task Join(CommandContext ctx)
@@ -24,6 +23,7 @@ namespace Uoiea.Models
             VoiceNextExtension voice;
             VoiceNextConnection conn;
             VoiceTransmitSink sink;
+            //StreamWriter writer;
 
             DiscordMember member = ctx.Member;
 
@@ -32,28 +32,36 @@ namespace Uoiea.Models
                 await ctx.RespondAsync("You must be in a voice channel to use this command");
                 return;
             }
-            
+
             voice = ctx.Client.GetVoiceNext();
             conn = await voice.ConnectAsync(member.VoiceState.Channel);
             sink = conn.GetTransmitSink();
+            //writer = new(TTSPipe);
 
-            //string temp = Guid.NewGuid().ToString();
+            string temp = Guid.NewGuid().ToString();
+            await TTSPipe.WriteAsync(Encoding.UTF8.GetBytes(temp));
+            await TTSPipe.FlushAsync();
 
-            //await TTSPipe.Writer.WriteAsync(temp);
+            Memory<byte> buffer = new();
+            await TTSPipe.ReadAsync(buffer);
+            string read = Encoding.UTF8.GetString(buffer.ToArray());
 
-            //string read = await TTSPipe.Reader.ReadLineAsync();
+            string output = $"generated guid: {temp} \nreceived guid: {read}";
+            await ctx.RespondAsync(output);
 
-            //string output = $"generated guid: {temp} \nreceived guid: {read}";
-            //await ctx.RespondAsync(output);
+            //await ctx.RespondAsync("done, retard");
 
-            await ctx.RespondAsync("done, retard");
+            //byte[] buffer = Encoding.UTF8.GetBytes("hello");
+            //byte[] opus = new byte[1024];
+            //await TTSPipe.WriteAsync(buffer);
+            //await TTSPipe.FlushAsync();
 
-            //await TTSPipe.Writer.WriteAsync("hello!");
-            TTSPipe.Writer.Write("hello!");
-            TTSPipe.WaitForPipeDrain();
+            //buffer = new byte[1024];
+            //await TTSPipe.ReadAsync(buffer);
 
-            await TTSPipe.Reader.CopyToAsync(sink);
-            //TTSPipe.Reader.CopyTo(sink);
+            //MemoryStream opusStream = new(opus);
+            //await opusStream.CopyToAsync(opusStream);
+            //await TTSPipe.CopyToAsync(sink);
         }
 
         [Command("leave")]

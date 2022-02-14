@@ -15,26 +15,6 @@ namespace Uoiea.Models
 {
     public sealed class DiscordBot : IDisposable
     {
-        public class StreamHandle //TODO own place to stay
-        {
-            public Stream Reader { get; init; }
-            public StreamWriter Writer { get; init; }
-
-            readonly AnonymousPipeServerStream readStream;
-            readonly AnonymousPipeServerStream writeStream;
-
-            public StreamHandle(AnonymousPipeServerStream read, AnonymousPipeServerStream write)
-            {
-                readStream = read;
-                Reader = readStream;
-                writeStream = write;
-                Writer = new(writeStream);
-                Writer.AutoFlush = true;
-            }
-
-            public void WaitForPipeDrain() => writeStream.WaitForPipeDrain();
-        }
-
         public CancellationToken Cancellation { get; init; }
         private CancellationTokenSource CancellationSource { get; init; }
 
@@ -43,7 +23,7 @@ namespace Uoiea.Models
 
         public DiscordBot(AppConfig config)
         {
-            IServiceCollection services = new ServiceCollection().AddSingleton(new StreamHandle(config.TTSRead, config.TTSWrite));
+            IServiceCollection services = new ServiceCollection().AddSingleton(config.TTSPipe);
 
             CancellationSource = new CancellationTokenSource();
             Cancellation = CancellationSource.Token;

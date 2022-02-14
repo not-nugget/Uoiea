@@ -14,22 +14,19 @@ namespace Uoiea
             Logger logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
             ILoggerFactory factory = new LoggerFactory().AddSerilog(logger);
 
-            using AppConfig config = new(factory);
+            string pipeName = "ttsPipe";
+            using AppConfig config = new(factory, pipeName);
             using DiscordBot bot = new(config);
 
-            string handleA = config.TTSRead.GetClientHandleAsString(), handleB = config.TTSWrite.GetClientHandleAsString();
-
             //start TTS speak process which connects to the pipe
-            ProcessStartInfo startInfo = new (@"E:\GitHub\Uoiea\SpeakServer\bin\Debug\SpeakServer.exe", string.Join(' ', handleA, handleB))
+            ProcessStartInfo startInfo = new (@"E:\GitHub\Uoiea\SpeakServer\bin\x86\Debug\SpeakServer.exe", pipeName)
             {
                 WindowStyle = ProcessWindowStyle.Normal,
                 UseShellExecute = false,
                 CreateNoWindow = false,
             };
             using Process ttsProcess = Process.Start(startInfo);
-
-            config.TTSRead.DisposeLocalCopyOfClientHandle();
-            config.TTSWrite.DisposeLocalCopyOfClientHandle();
+            config.TTSPipe.WaitForConnection();
 
             await bot.StartAsync();
             await Task.Delay(-1);

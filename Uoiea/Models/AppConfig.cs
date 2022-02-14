@@ -11,21 +11,18 @@ namespace Uoiea.Models
         public ILoggerFactory LoggerFactory { get; init; }
         public string Token { get; init; }
 
-        public AnonymousPipeServerStream TTSRead { get; init; }
-        public AnonymousPipeServerStream TTSWrite { get; init; }
+        public NamedPipeServerStream TTSPipe { get; init; }
 
-        internal AppConfig(ILoggerFactory loggerFactory)
+        internal AppConfig(ILoggerFactory loggerFactory, string pipeName = "ttsPipe")
         {
             LoggerFactory = loggerFactory;
             Token = ConfigurationManager.AppSettings.Get("token");
-            TTSRead = new(PipeDirection.In, HandleInheritability.Inheritable);
-            TTSWrite = new(PipeDirection.Out, HandleInheritability.Inheritable);
+            TTSPipe = new NamedPipeServerStream(pipeName, PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
         }
 
         public void Dispose()
         {
-            TTSRead.Dispose();
-            TTSWrite.Dispose();
+            TTSPipe.Dispose();
         }
     }
 }
