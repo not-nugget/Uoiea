@@ -35,25 +35,18 @@ namespace Uoiea.Models
             
             voice = ctx.Client.GetVoiceNext();
             conn = await voice.ConnectAsync(member.VoiceState.Channel);
-            sink = conn.GetTransmitSink();
+            //sink = conn.GetTransmitSink();
 
-            //string temp = Guid.NewGuid().ToString();
+            string temp = Guid.NewGuid().ToString();
+            await TTSPipe.Writer.WriteAsync(Encoding.UTF8.GetBytes(temp));
+            await TTSPipe.Reader.FlushAsync();
 
-            //await TTSPipe.Writer.WriteAsync(temp);
+            Memory<byte> buffer = new();
+            await TTSPipe.Reader.ReadAsync(buffer);
+            string read = Encoding.UTF8.GetString(buffer.ToArray());
 
-            //string read = await TTSPipe.Reader.ReadLineAsync();
-
-            //string output = $"generated guid: {temp} \nreceived guid: {read}";
-            //await ctx.RespondAsync(output);
-
-            await ctx.RespondAsync("done, retard");
-
-            //await TTSPipe.Writer.WriteAsync("hello!");
-            TTSPipe.Writer.Write("hello!");
-            TTSPipe.WaitForPipeDrain();
-
-            await TTSPipe.Reader.CopyToAsync(sink);
-            //TTSPipe.Reader.CopyTo(sink);
+            string output = $"generated guid: {temp} \nreceived guid: {read}";
+            await ctx.RespondAsync(output);
         }
 
         [Command("leave")]

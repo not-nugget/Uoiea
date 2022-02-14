@@ -3,11 +3,8 @@ using DSharpPlus.CommandsNext;
 using DSharpPlus.VoiceNext;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.IO.Pipes;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,7 +15,7 @@ namespace Uoiea.Models
         public class StreamHandle //TODO own place to stay
         {
             public Stream Reader { get; init; }
-            public StreamWriter Writer { get; init; }
+            public Stream Writer { get; init; }
 
             readonly AnonymousPipeServerStream readStream;
             readonly AnonymousPipeServerStream writeStream;
@@ -28,11 +25,8 @@ namespace Uoiea.Models
                 readStream = read;
                 Reader = readStream;
                 writeStream = write;
-                Writer = new(writeStream);
-                Writer.AutoFlush = true;
+                Writer = writeStream;
             }
-
-            public void WaitForPipeDrain() => writeStream.WaitForPipeDrain();
         }
 
         public CancellationToken Cancellation { get; init; }
