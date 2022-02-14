@@ -19,7 +19,7 @@ namespace Uoiea
             using DiscordBot bot = new(config);
 
             //start TTS speak process which connects to the pipe
-            ProcessStartInfo startInfo = new (@"E:\GitHub\Uoiea\SpeakServer\bin\x86\Debug\SpeakServer.exe", pipeName)
+            ProcessStartInfo startInfo = new (@"E:\GitHub\Uoiea\SpeakServer\bin\Debug\SpeakServer.exe", pipeName)
             {
                 WindowStyle = ProcessWindowStyle.Normal,
                 UseShellExecute = false,

@@ -5,7 +5,6 @@ using DSharpPlus.VoiceNext;
 using System.IO.Pipes;
 using System.Text;
 using System.Threading.Tasks;
-using OpusDotNet;
 using System.IO;
 using System;
 

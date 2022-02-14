@@ -17,7 +17,7 @@ namespace Uoiea.Models
         {
             LoggerFactory = loggerFactory;
             Token = ConfigurationManager.AppSettings.Get("token");
-            TTSPipe = new NamedPipeServerStream(pipeName, PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
+            TTSPipe = new NamedPipeServerStream(pipeName, PipeDirection.InOut, 2, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
         }
 
         public void Dispose()
