@@ -1,7 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Core;
+using System;
 using System.Diagnostics;
+using System.Text;
 using System.Threading.Tasks;
 using Uoiea.Models;
 
@@ -26,12 +28,20 @@ namespace Uoiea
                 UseShellExecute = false,
                 CreateNoWindow = false,
             };
+
             using Process ttsProcess = Process.Start(startInfo);
 
             config.TTSRead.DisposeLocalCopyOfClientHandle();
             config.TTSWrite.DisposeLocalCopyOfClientHandle();
 
             await bot.StartAsync();
+
+            int input = 250;
+            byte[] read = new byte[input];
+            await config.TTSWrite.WriteAsync(Encoding.UTF8.GetBytes("test pipe write string"));
+            await config.TTSRead.ReadAsync(read.AsMemory(0, input));
+            Console.Write(Encoding.UTF8.GetString(read).ToCharArray(), 0, read.Length);
+
             await Task.Delay(-1);
         }
     }

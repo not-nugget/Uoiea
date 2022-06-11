@@ -50,8 +50,8 @@ namespace Uoiea.Models
 
             //await TTSPipe.Writer.WriteAsync("hello!");
             TTSPipe.Writer.Write("hello!");
-            TTSPipe.WaitForPipeDrain();
-
+            //TTSPipe.WaitForPipeDrain();
+            
             await TTSPipe.Reader.CopyToAsync(sink);
             //TTSPipe.Reader.CopyTo(sink);
         }

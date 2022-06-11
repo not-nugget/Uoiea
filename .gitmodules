@@ -1,0 +1,3 @@
+[submodule "SharpTalk"]
+	path = SharpTalk
+	url = https://github.com/whatsecretproject/SharpTalk.git
