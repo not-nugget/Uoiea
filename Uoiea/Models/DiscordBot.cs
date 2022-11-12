@@ -1,71 +1,39 @@
-﻿using DSharpPlus;
-using DSharpPlus.CommandsNext;
-using DSharpPlus.VoiceNext;
-using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.IO.Pipes;
-using System.Linq;
-using System.Text;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using DSharpPlus;
+using DSharpPlus.SlashCommands;
+using DSharpPlus.VoiceNext;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Uoiea.Commands;
 
 namespace Uoiea.Models
 {
-    public sealed class DiscordBot : IDisposable
+    internal sealed class DiscordBot : IHostedService, IDisposable
     {
-        public class StreamHandle //TODO own place to stay
-        {
-            public Stream Reader { get; init; }
-            public StreamWriter Writer { get; init; }
-
-            readonly AnonymousPipeServerStream readStream;
-            readonly AnonymousPipeServerStream writeStream;
-
-            public StreamHandle(AnonymousPipeServerStream read, AnonymousPipeServerStream write)
-            {
-                readStream = read;
-                Reader = readStream;
-                writeStream = write;
-                Writer = new(writeStream);
-                Writer.AutoFlush = true;
-            }
-
-            public void WaitForPipeDrain() => writeStream.WaitForPipeDrain();
-        }
-
-        public CancellationToken Cancellation { get; init; }
-        private CancellationTokenSource CancellationSource { get; init; }
-
         private DiscordClient Client { get; init; }
-        private CommandsNextExtension Commands { get; init; }
+        private SlashCommandsExtension Commands { get; init; }
 
-        public DiscordBot(AppConfig config)
+        public DiscordBot(IServiceProvider services, IOptions<DiscordConfig> config)
         {
-            IServiceCollection services = new ServiceCollection().AddSingleton(new StreamHandle(config.TTSRead, config.TTSWrite));
-
-            CancellationSource = new CancellationTokenSource();
-            Cancellation = CancellationSource.Token;
-
             Client = new(new DiscordConfiguration()
             {
                 Intents = DiscordIntents.AllUnprivileged,
-                LoggerFactory = config.LoggerFactory,
-                Token = config.Token,
+                LoggerFactory = services.GetService<ILoggerFactory>(),
+                Token = config.Value.Token,
             });
-
-            Commands = Client.UseCommandsNext(new()
-            {
-                EnableDms = false,
-                EnableDefaultHelp = false,
-                EnableMentionPrefix = false,
-                StringPrefixes = new[] { "!" },
-                Services = services.BuildServiceProvider(),
-            });
-            Commands.RegisterCommands<TTSCommands>();
 
             Client.UseVoiceNext();
+
+            Commands = Client.UseSlashCommands(new()
+            {
+                Services = services,
+            });
+
+            Commands.RegisterCommands<DECTalkCommands>();
         }
 
         public async Task StartAsync(CancellationToken token = default)
