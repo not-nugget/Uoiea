@@ -1,48 +1,65 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System;
+using System.Threading.Tasks;
+using CliWrap;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Configuration;
 using Serilog;
 using Serilog.Core;
-using System;
-using System.Diagnostics;
-using System.Text;
-using System.Threading.Tasks;
 using Uoiea.Models;
+using SharpTalk;
+using System.Linq;
+using Uoiea.Commands;
 
 namespace Uoiea
 {
     static class Program
     {
+        //-i ""{filePath}"" -ac 2 -f s16le -ar 48000 pipe:1
+        //-i pipe:0 -isr 11025 -ich 1 -och 2 -osr 48000 pipe:1
+
+        private static readonly string[] FfmpegArgs = new[] { "-i", "pipe:0", "-f", "s16le", "-isr", "11025", "-ich", "1", "-osr", "48000", "-och", "2", "pipe:1" };
+        private static readonly Command Ffmpeg = Cli.Wrap("ffmpeg").WithArguments(FfmpegArgs).WithStandardErrorPipe(PipeTarget.ToDelegate(Console.Error.WriteLine));
         static async Task Main(string[] args)
         {
-            Logger logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
-            ILoggerFactory factory = new LoggerFactory().AddSerilog(logger);
+            Logger logger = new LoggerConfiguration().WriteTo.Console().Enrich.FromLogContext().CreateLogger();
+            ILoggerFactory loggerFactory = new LoggerFactory().AddSerilog(logger);
 
-            using AppConfig config = new(factory);
-            using DiscordBot bot = new(config);
-
-            string handleA = config.TTSRead.GetClientHandleAsString(), handleB = config.TTSWrite.GetClientHandleAsString();
-
-            //start TTS speak process which connects to the pipe
-            ProcessStartInfo startInfo = new (@"E:\GitHub\Uoiea\SpeakServer\bin\Debug\SpeakServer.exe", string.Join(' ', handleA, handleB))
+            await
+            Host.CreateDefaultBuilder(args)
+            .ConfigureAppConfiguration((ctx, cfg) =>
             {
-                WindowStyle = ProcessWindowStyle.Normal,
-                UseShellExecute = false,
-                CreateNoWindow = false,
-            };
+                cfg.AddJsonFile("appsettings.json", false);
+                cfg.AddJsonFile($"appsettings.{ctx.HostingEnvironment.EnvironmentName}.json", true);
+            })
+            .ConfigureLogging((ctx, log) =>
+            {
+                log.ClearProviders();
+                log.AddSerilog(logger, true);
+            })
+            .ConfigureServices((ctx, svs) =>
+            {
+                svs.Configure<DiscordConfig>(ctx.Configuration.GetSection(nameof(DiscordConfig)));
 
-            using Process ttsProcess = Process.Start(startInfo);
+                svs.AddSingleton<FonixTalkEngine>();
+                svs.AddSingleton(loggerFactory);
+                svs.AddSingleton(Ffmpeg);
 
-            config.TTSRead.DisposeLocalCopyOfClientHandle();
-            config.TTSWrite.DisposeLocalCopyOfClientHandle();
+                svs.AddHostedService<DiscordBot>();
 
-            await bot.StartAsync();
-
-            int input = 250;
-            byte[] read = new byte[input];
-            await config.TTSWrite.WriteAsync(Encoding.UTF8.GetBytes("test pipe write string"));
-            await config.TTSRead.ReadAsync(read.AsMemory(0, input));
-            Console.Write(Encoding.UTF8.GetString(read).ToCharArray(), 0, read.Length);
-
-            await Task.Delay(-1);
+#if DEBUG
+                if(args.Any(x => x == "--debug"))
+                {
+                    svs.AddSingleton<DECTalkCommands>();
+                    svs.AddHostedService<DebugHS>();
+                }
+#endif
+            })
+            .UseConsoleLifetime()
+            .Build()
+            .RunAsync();
         }
+
     }
 }
