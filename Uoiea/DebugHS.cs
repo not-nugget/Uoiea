@@ -9,10 +9,10 @@ namespace Uoiea
 #if DEBUG
     class DebugHS : IHostedService
     {
-        public DECTalkCommands Ttsc { get; }
+        public TalkCommands Ttsc { get; }
         public Command Ffmpeg { get; }
 
-        public DebugHS(DECTalkCommands ttsc, Command ffmpeg)
+        public DebugHS(TalkCommands ttsc, Command ffmpeg)
         {
             Ttsc = ttsc;
             Ffmpeg = ffmpeg;

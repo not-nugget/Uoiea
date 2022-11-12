@@ -11,9 +11,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Uoiea", "Uoiea.csproj", "{C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpeakServer", "..\SpeakServer\SpeakServer.csproj", "{A8EADFE0-04D6-42E6-A99C-3C5086D18625}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpTalk", "..\SharpTalk\SharpTalk\SharpTalk.csproj", "{339EA1D4-4CDE-4342-AAA0-81A35FCF87DC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpTalk", "..\SharpTalk\SharpTalk\SharpTalk.csproj", "{339EA1D4-4CDE-4342-AAA0-81A35FCF87DC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nugget.Utilities", "..\..\Nugget.Utilities\Nugget.Utilities\Nugget.Utilities.csproj", "{D23AD828-B1D6-4460-A656-8DC6C73CBEBB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmarks", "..\Benchmarks\Benchmarks.csproj", "{E1492DFF-7AE1-4826-B884-5DE983DF9E02}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -55,6 +57,14 @@ Global
 		{D23AD828-B1D6-4460-A656-8DC6C73CBEBB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D23AD828-B1D6-4460-A656-8DC6C73CBEBB}.Release|x86.ActiveCfg = Release|Any CPU
 		{D23AD828-B1D6-4460-A656-8DC6C73CBEBB}.Release|x86.Build.0 = Release|Any CPU
+		{E1492DFF-7AE1-4826-B884-5DE983DF9E02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E1492DFF-7AE1-4826-B884-5DE983DF9E02}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E1492DFF-7AE1-4826-B884-5DE983DF9E02}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E1492DFF-7AE1-4826-B884-5DE983DF9E02}.Debug|x86.Build.0 = Debug|Any CPU
+		{E1492DFF-7AE1-4826-B884-5DE983DF9E02}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E1492DFF-7AE1-4826-B884-5DE983DF9E02}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E1492DFF-7AE1-4826-B884-5DE983DF9E02}.Release|x86.ActiveCfg = Release|Any CPU
+		{E1492DFF-7AE1-4826-B884-5DE983DF9E02}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

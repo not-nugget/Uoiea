@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "Uoiea": {
+      "commandName": "Project"
+    },
+    "Uoiea --debug": {
+      "commandName": "Project",
+      "commandLineArgs": "--debug"
+    }
+  }
+}

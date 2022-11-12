@@ -2,15 +2,16 @@
 using System.Linq;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
+using DSharpPlus.VoiceNext;
 
 namespace Uoiea.Models
 {
     internal static class Extensions
     {
-        public static DiscordEmbedBuilder WithAuthor(this DiscordEmbedBuilder builder, BaseContext ctx)
-        {
-            return builder.WithAuthor(ctx.User.Username, null, ctx.User.AvatarUrl);
-        }
+        public static VoiceNextExtension GetVoiceNext(this InteractionContext ctx) => ctx.Client.GetVoiceNext();
+        public static VoiceNextConnection GetVoiceNextConnection(this InteractionContext ctx) => ctx.GetVoiceNext().GetConnection(ctx.Guild);
+
+        public static DiscordEmbedBuilder WithAuthor(this DiscordEmbedBuilder builder, BaseContext ctx) => builder.WithAuthor(ctx.User.Username, null, ctx.User.AvatarUrl);
 
         public static class Enumerable
         {

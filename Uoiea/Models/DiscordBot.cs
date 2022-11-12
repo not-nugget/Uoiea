@@ -33,7 +33,7 @@ namespace Uoiea.Models
                 Services = services,
             });
 
-            Commands.RegisterCommands<DECTalkCommands>();
+            Commands.RegisterCommands<TalkCommands>();
         }
 
         public async Task StartAsync(CancellationToken token = default)

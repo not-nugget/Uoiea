@@ -16,11 +16,6 @@ namespace Uoiea
 {
     static class Program
     {
-        //-i ""{filePath}"" -ac 2 -f s16le -ar 48000 pipe:1
-        //-i pipe:0 -isr 11025 -ich 1 -och 2 -osr 48000 pipe:1
-
-        private static readonly string[] FfmpegArgs = new[] { "-i", "pipe:0", "-f", "s16le", "-isr", "11025", "-ich", "1", "-osr", "48000", "-och", "2", "pipe:1" };
-        private static readonly Command Ffmpeg = Cli.Wrap("ffmpeg").WithArguments(FfmpegArgs).WithStandardErrorPipe(PipeTarget.ToDelegate(Console.Error.WriteLine));
         static async Task Main(string[] args)
         {
             Logger logger = new LoggerConfiguration().WriteTo.Console().Enrich.FromLogContext().CreateLogger();
@@ -42,16 +37,16 @@ namespace Uoiea
             {
                 svs.Configure<DiscordConfig>(ctx.Configuration.GetSection(nameof(DiscordConfig)));
 
+                svs.AddSingleton<SpeakConnectionContext>();
                 svs.AddSingleton<FonixTalkEngine>();
                 svs.AddSingleton(loggerFactory);
-                svs.AddSingleton(Ffmpeg);
 
                 svs.AddHostedService<DiscordBot>();
 
 #if DEBUG
                 if(args.Any(x => x == "--debug"))
                 {
-                    svs.AddSingleton<DECTalkCommands>();
+                    svs.AddSingleton<TalkCommands>();
                     svs.AddHostedService<DebugHS>();
                 }
 #endif
